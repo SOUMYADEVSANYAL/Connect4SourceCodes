@@ -15,6 +15,19 @@ import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
 
+	//Rules of Connect4
+	private static final int COLUMNS = 7;
+	private static final int ROWS = 6;
+	private static final int CIRCLE_DIAMETER = 80;
+
+	private static final String DISC_COLOR1 = "#24303E";
+	private static final String DISC_COLOR2 = "#4CAA88";
+
+	private static String playerOneName = "Player One";
+	private static String playerTwoName = "Player Two";
+
+	private boolean isPlayerOneTurn = true;
+
 	@FXML
 	public GridPane rootGridPane;
 
