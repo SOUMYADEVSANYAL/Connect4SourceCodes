@@ -27,7 +27,6 @@ public class Main extends Application {
 
 		MenuBar menuBar = createMenu();
 		menuBar.prefWidthProperty().bind(primaryStage.widthProperty());// to make the menuBar take the width of the primaryStage
-//		menuBar.prefHeightProperty().bind(controller.menuPane.widthProperty());
 
 		Pane menuPane = (Pane) rootGridPane.getChildren().get(0);
 
