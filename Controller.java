@@ -1,5 +1,6 @@
 package com.SoumyadevSanyal.connectfour;
 
+import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -14,6 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
+import javafx.util.Duration;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -34,6 +36,8 @@ public class Controller implements Initializable {
 	private static String playerTwoName = "Player Two";
 
 	private boolean isPlayerOneTurn = true;
+
+	private Disc[][] insertedDiscsArray = new Disc[ROWS][COLUMNS]; // for structural use only: for the developers
 
 	@FXML
 	public GridPane rootGridPane;
@@ -88,7 +92,42 @@ public class Controller implements Initializable {
 
 		return rectangleList;
 	}
-	private static void insertDisc(Disc disc, int column){}
+	private void insertDisc(Disc disc, int column){
+
+		int row = ROWS-1;
+		while (row > 0){
+			if(insertedDiscsArray[row][column] == null)
+				break;
+			row--;
+		}
+
+		if (row < 0) // The column is full do nothing
+			return;
+
+		insertedDiscsArray[row][column] = disc; // for structural use only
+		insertedDiscsPane.getChildren().add(disc);
+//		disc.setCenterX(CIRCLE_DIAMETER * column + CIRCLE_DIAMETER/2);
+		disc.setTranslateX(column*CIRCLE_DIAMETER);
+
+		int current_row = row;
+		TranslateTransition translateTransition = new TranslateTransition(Duration.seconds(0.5), disc);
+
+//		disc.setCenterY(5*CIRCLE_DIAMETER+ CIRCLE_DIAMETER/2);
+		translateTransition.setToY(row*CIRCLE_DIAMETER);
+		translateTransition.setOnFinished(event -> {
+			if (gameEnded(current_row, column)){
+
+			}
+			isPlayerOneTurn = !isPlayerOneTurn;
+			playerNameLabel.setText(isPlayerOneTurn? playerOneName : playerTwoName);
+		});
+		translateTransition.play();
+
+	}
+
+	private boolean gameEnded(int current_row, int column) {
+		return true;
+	}
 
 	private static class Disc extends Circle{
 		private final boolean isPlayerOneMove;
