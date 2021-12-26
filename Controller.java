@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -21,6 +22,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Controller implements Initializable {
 
@@ -57,8 +60,8 @@ public class Controller implements Initializable {
 		List<Rectangle> rectangleList = createClickableRectangle();
 
 
-		for (Rectangle rectangle:
-		     rectangleList) {
+		for (Rectangle rectangle :
+				rectangleList) {
 			rootGridPane.add(rectangle, 0, 1);
 		}
 
@@ -69,9 +72,9 @@ public class Controller implements Initializable {
 		List<Rectangle> rectangleList = new ArrayList<>();
 
 		for (int i = 0; i < COLUMNS; i++) {
-			Rectangle rectangle = new Rectangle(CIRCLE_DIAMETER, (ROWS)*CIRCLE_DIAMETER );
+			Rectangle rectangle = new Rectangle(CIRCLE_DIAMETER, (ROWS) * CIRCLE_DIAMETER);
 			rectangle.setFill(Color.TRANSPARENT);
-			rectangle.setTranslateX(CIRCLE_DIAMETER*i);
+			rectangle.setTranslateX(CIRCLE_DIAMETER * i);
 
 			//hover effect
 			rectangle.setOnMouseEntered(event -> {
@@ -92,11 +95,12 @@ public class Controller implements Initializable {
 
 		return rectangleList;
 	}
-	private void insertDisc(Disc disc, int column){
 
-		int row = ROWS-1;
-		while (row > 0){
-			if(insertedDiscsArray[row][column] == null)
+	private void insertDisc(Disc disc, int column) {
+
+		int row = ROWS - 1;
+		while (row >= 0) {
+			if (getDiscIfPresent(row, column) == null)
 				break;
 			row--;
 		}
@@ -107,42 +111,99 @@ public class Controller implements Initializable {
 		insertedDiscsArray[row][column] = disc; // for structural use only
 		insertedDiscsPane.getChildren().add(disc);
 //		disc.setCenterX(CIRCLE_DIAMETER * column + CIRCLE_DIAMETER/2);
-		disc.setTranslateX(column*CIRCLE_DIAMETER);
+		disc.setTranslateX(column * CIRCLE_DIAMETER);
 
 		int current_row = row;
 		TranslateTransition translateTransition = new TranslateTransition(Duration.seconds(0.5), disc);
 
 //		disc.setCenterY(5*CIRCLE_DIAMETER+ CIRCLE_DIAMETER/2);
-		translateTransition.setToY(row*CIRCLE_DIAMETER);
+		translateTransition.setToY(row * CIRCLE_DIAMETER);
 		translateTransition.setOnFinished(event -> {
-			if (gameEnded(current_row, column)){
-
+			if (gameEnded(current_row, column)) {
+				gameOver();
 			}
 			isPlayerOneTurn = !isPlayerOneTurn;
-			playerNameLabel.setText(isPlayerOneTurn? playerOneName : playerTwoName);
+			playerNameLabel.setText(isPlayerOneTurn ? playerOneName : playerTwoName);
 		});
 		translateTransition.play();
 
 	}
 
-	private boolean gameEnded(int current_row, int column) {
-		return true;
+	private void gameOver() {
+		String winner = isPlayerOneTurn ? playerOneName : playerTwoName;
+		System.out.println("The winner is " + winner);
 	}
 
-	private static class Disc extends Circle{
+	private boolean gameEnded(int current_row, int current_column) {
+		List<Point2D> vertialPoints = IntStream.rangeClosed(current_row - 3, current_row + 3)
+				.mapToObj(r -> new Point2D(r, current_column)) //making the Point2D objects with variable rows and fixed column
+				.collect(Collectors.toList()); // collecting them in a list.
+
+		List<Point2D> horizontalPoints = IntStream.rangeClosed(current_column - 3, current_column + 3)
+				.mapToObj(cols -> new Point2D(current_row, cols))////making the Point2D objects with fixed row and variable column
+				.collect(Collectors.toList());// collecting them in a list.
+
+		Point2D startPoint1 = new Point2D(current_row - 3, current_column + 3);
+		List<Point2D> diagonal1Points = IntStream.rangeClosed(0, 6)
+				.mapToObj(i -> new Point2D(startPoint1.getX() + i, startPoint1.getY() - i))
+				.collect(Collectors.toList());
+
+		Point2D startPoint2 = new Point2D(current_row - 3, current_column - 3);
+		List<Point2D> diagonal2Points = IntStream.rangeClosed(0, 6)
+				.mapToObj(i -> startPoint2.add(i, i)) // new "Point2D(startPoint1.getX() + i, startPoint1.getY() - i)" by add method
+				.collect(Collectors.toList());
+
+		boolean isEnded = checkCombinations(vertialPoints) || checkCombinations(horizontalPoints)
+				|| checkCombinations(diagonal1Points) || checkCombinations(diagonal2Points);
+
+		return isEnded;
+	}
+
+	private boolean checkCombinations(List<Point2D> points) {
+
+		int chain = 0;
+		for (Point2D point :
+				points) {
+			int rowIndex = (int) point.getX();
+			int columnIndex = (int) point.getY();
+
+			Disc disc = getDiscIfPresent(rowIndex, columnIndex);
+
+			if (disc != null && disc.isPlayerOneMove == isPlayerOneTurn) {
+				chain++;
+				if (chain == 4)
+					return true;
+			} else {
+				chain = 0;
+			}
+
+		}
+		return false;
+
+	}
+
+	private Disc getDiscIfPresent(int row, int column) {
+		if (row >= ROWS || row < 0 || column >= COLUMNS || column < 0)
+			return null;
+		return insertedDiscsArray[row][column];
+
+	}
+
+	private static class Disc extends Circle {
 		private final boolean isPlayerOneMove;
-		public Disc(boolean isPlayerOneMove){
+
+		public Disc(boolean isPlayerOneMove) {
 			this.isPlayerOneMove = isPlayerOneMove;
-			setRadius(CIRCLE_DIAMETER/2);
-			setFill(isPlayerOneMove? Color.valueOf(DISC_COLOR1):Color.valueOf(DISC_COLOR2));
-			setCenterX(CIRCLE_DIAMETER/2);
-			setCenterY(CIRCLE_DIAMETER/2);
+			setRadius(CIRCLE_DIAMETER / 2);
+			setFill(isPlayerOneMove ? Color.valueOf(DISC_COLOR1) : Color.valueOf(DISC_COLOR2));
+			setCenterX(CIRCLE_DIAMETER / 2);
+			setCenterY(CIRCLE_DIAMETER / 2);
 		}
 	}
 
 	private Shape createGameStructureGrid() { // This method is creating the white rectangle with blue holes by
-		                                      //subtracting the cirlce from the rectangle
-		Shape rectangleWithHoles = new Rectangle((COLUMNS)*CIRCLE_DIAMETER, (ROWS)*CIRCLE_DIAMETER);
+		//subtracting the cirlce from the rectangle
+		Shape rectangleWithHoles = new Rectangle((COLUMNS) * CIRCLE_DIAMETER, (ROWS) * CIRCLE_DIAMETER);
 
 		// Setting the center co-ordinates with out the setTranslate method
 		int k = 1;
@@ -151,18 +212,18 @@ public class Controller implements Initializable {
 		for (int i = 0; i < ROWS; i++) {
 			for (int j = 0; j < COLUMNS; j++) {
 				Circle circle = new Circle();
-				circle.setRadius(CIRCLE_DIAMETER/2);
-				circle.setCenterX(CIRCLE_DIAMETER/2*k);
-				circle.setCenterY(CIRCLE_DIAMETER/2*l);
+				circle.setRadius(CIRCLE_DIAMETER / 2);
+				circle.setCenterX(CIRCLE_DIAMETER / 2 * k);
+				circle.setCenterY(CIRCLE_DIAMETER / 2 * l);
 
 				// Setting co-ordinates of centers using setTranslate method
 //				circle.setTranslateX(i*(CIRCLE_DIAMETER+5));
 //				circle.setTranslateY(j*(CIRCLE_DIAMETER+5));
 
 				rectangleWithHoles = Shape.subtract(rectangleWithHoles, circle);
-				k = k+2;
+				k = k + 2;
 			}
-			l=l+2;
+			l = l + 2;
 			k = 1;
 		}
 
