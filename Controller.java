@@ -1,14 +1,13 @@
 package com.SoumyadevSanyal.connectfour;
 
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -21,6 +20,7 @@ import javafx.util.Duration;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -50,6 +50,12 @@ public class Controller implements Initializable {
 
 	@FXML
 	public Label playerNameLabel;
+
+	@FXML
+	public TextField playerOneLabel, playerTwoLabel;
+
+	@FXML
+	public Button setNameButton;
 
 	public void createPlayground() {
 
@@ -132,6 +138,42 @@ public class Controller implements Initializable {
 	private void gameOver() {
 		String winner = isPlayerOneTurn ? playerOneName : playerTwoName;
 		System.out.println("The winner is " + winner);
+
+		Alert alert = new Alert(Alert.AlertType.INFORMATION);
+		alert.setTitle("Connect4");
+		alert.setHeaderText("The winner is " + winner);
+		alert.setContentText("Wanna play again?");
+
+		ButtonType yesButton = new ButtonType("Sure");
+		ButtonType noButton = new ButtonType("No, thanks!!");
+
+		alert.getButtonTypes().setAll(yesButton, noButton);
+
+		Platform.runLater(() -> {
+			Optional<ButtonType> btnClicked = alert.showAndWait();
+			if (btnClicked.isPresent() && btnClicked.get() == yesButton){
+				resetGame();
+			}else {
+				Platform.exit();
+				System.exit(0);
+			}
+		});
+
+	}
+
+	private void resetGame() {
+		insertedDiscsPane.getChildren().clear();
+
+		for (int row = 0; row < insertedDiscsArray.length; row++) {
+			for (int col = 0; col < insertedDiscsArray[row].length; col++) {
+				insertedDiscsArray[row][col] = null;
+			}
+		}
+		isPlayerOneTurn = true;
+		playerNameLabel.setText(playerOneName);
+
+		createPlayground();
+
 	}
 
 	private boolean gameEnded(int current_row, int current_column) {
@@ -234,6 +276,12 @@ public class Controller implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+
+		setNameButton.setOnAction(event -> {
+			playerOneName = playerOneLabel.getText();
+			playerTwoName = playerTwoLabel.getText();
+			playerNameLabel.setText(playerOneName);
+		});
 
 	}
 }

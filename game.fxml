@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<GridPane fx:id="rootGridPane" style="-fx-background-color: #D9F7F0;" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.SoumyadevSanyal.connectfour.Controller">
+<GridPane fx:id="rootGridPane" style="-fx-background-color: #D9F7F0;" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.SoumyadevSanyal.connectfour.Controller">
     <columnConstraints>
         <ColumnConstraints />
         <ColumnConstraints />
@@ -19,15 +19,15 @@
       <Pane fx:id="insertedDiscsPane" prefHeight="400.0" prefWidth="200.0" GridPane.rowIndex="1" />
       <VBox style="-fx-background-color: #2B3B4C;" GridPane.columnIndex="1" GridPane.rowIndex="1">
          <children>
-            <TextField>
+            <TextField fx:id="playerOneLabel">
                <VBox.margin>
                   <Insets bottom="5.0" left="20.0" right="20.0" top="10.0" />
                </VBox.margin></TextField>
-            <TextField>
+            <TextField fx:id="playerTwoLabel">
                <VBox.margin>
                   <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
                </VBox.margin></TextField>
-            <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="306.0" text="Button">
+            <Button fx:id="setNameButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="306.0" text="Button">
                <VBox.margin>
                   <Insets bottom="5.0" left="30.0" right="30.0" top="5.0" />
                </VBox.margin></Button>
