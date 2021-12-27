@@ -57,6 +57,8 @@ public class Controller implements Initializable {
 	@FXML
 	public Button setNameButton;
 
+	private boolean isAllowedToInsert = true;
+
 	public void createPlayground() {
 
 		Shape rectangleWithHoles = createGameStructureGrid();
@@ -93,7 +95,11 @@ public class Controller implements Initializable {
 
 			final int column = i;
 			rectangle.setOnMouseClicked(event -> {
-				insertDisc(new Disc(isPlayerOneTurn), column);
+				if (isAllowedToInsert){
+					isAllowedToInsert = false;
+					insertDisc(new Disc(isPlayerOneTurn), column);
+				}
+
 			});
 
 			rectangleList.add(rectangle);
@@ -125,6 +131,8 @@ public class Controller implements Initializable {
 //		disc.setCenterY(5*CIRCLE_DIAMETER+ CIRCLE_DIAMETER/2);
 		translateTransition.setToY(row * CIRCLE_DIAMETER);
 		translateTransition.setOnFinished(event -> {
+
+			isAllowedToInsert = true;
 			if (gameEnded(current_row, column)) {
 				gameOver();
 			}
@@ -161,7 +169,7 @@ public class Controller implements Initializable {
 
 	}
 
-	private void resetGame() {
+	public void resetGame() {
 		insertedDiscsPane.getChildren().clear();
 
 		for (int row = 0; row < insertedDiscsArray.length; row++) {
@@ -240,6 +248,7 @@ public class Controller implements Initializable {
 			setFill(isPlayerOneMove ? Color.valueOf(DISC_COLOR1) : Color.valueOf(DISC_COLOR2));
 			setCenterX(CIRCLE_DIAMETER / 2);
 			setCenterY(CIRCLE_DIAMETER / 2);
+			setSmooth(true);
 		}
 	}
 
@@ -257,6 +266,7 @@ public class Controller implements Initializable {
 				circle.setRadius(CIRCLE_DIAMETER / 2);
 				circle.setCenterX(CIRCLE_DIAMETER / 2 * k);
 				circle.setCenterY(CIRCLE_DIAMETER / 2 * l);
+				circle.setSmooth(true);
 
 				// Setting co-ordinates of centers using setTranslate method
 //				circle.setTranslateX(i*(CIRCLE_DIAMETER+5));
