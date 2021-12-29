@@ -44,7 +44,7 @@ public class Main extends Application {
 		Menu fileMenu = new Menu("File");
 
 		MenuItem newGame = new MenuItem("New Game");
-		newGame.setOnAction(event -> controller.resetGame());
+		newGame.setOnAction(event -> resetGame());
 
 		MenuItem resetGame = new MenuItem("Reset Game");
 		resetGame.setOnAction(event -> controller.resetGame());
@@ -109,6 +109,12 @@ public class Main extends Application {
 	}
 
 	private void resetGame() {
+		controller.playerOneLabel.clear();
+		controller.playerTwoLabel.clear();
+
+		controller.playerOneName = "Player One";
+		controller.playerTwoName = "Player Two";
+		controller.resetGame();
 	}
 
 

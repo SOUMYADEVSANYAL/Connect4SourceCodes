@@ -35,8 +35,8 @@ public class Controller implements Initializable {
 	private static final String DISC_COLOR1 = "#24303E";
 	private static final String DISC_COLOR2 = "#4CAA88";
 
-	private static String playerOneName = "Player One";
-	private static String playerTwoName = "Player Two";
+	public static String playerOneName = "Player One";
+	public static String playerTwoName = "Player Two";
 
 	private boolean isPlayerOneTurn = true;
 
@@ -288,9 +288,11 @@ public class Controller implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 
 		setNameButton.setOnAction(event -> {
+
 			playerOneName = playerOneLabel.getText();
 			playerTwoName = playerTwoLabel.getText();
-			playerNameLabel.setText(playerOneName);
+			if(playerOneName != "" && playerTwoName != "")
+				playerNameLabel.setText(playerOneName);
 		});
 
 	}
